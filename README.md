@@ -23,8 +23,12 @@ You can install the latest version of the app directly from this repository:
 ## ✨ Features
 
 - **Blazing Fast Logging**: Add expenses and incomes in seconds.
+- **Large Purchases & Liabilities**: Easily record and manage huge expenses. Isolate these from your daily tracking so your regular budgets aren't artificially distorted. 
+- **Intelligent Auto-Reduction EMI/Loans**: Input Loans or EMI. Choose frequencies of Daily, Weekly, or Monthly! FlowLedger will automatically decrease your pending active loan principals and remaining EMI periods on the exact interval without any manual input! 
+- **Specific Payment Methods**: Track large purchases via specific payment methods: Cash, UPI, and Card. 
+- **Dynamic Search & Filtering**: Deep search with intelligent chips filtering for UPI, Card, Cash, or specifically Large Purchases inside the discovery tab!
 - **Budget Limits**: Set custom Daily, Weekly, and Monthly spending limits. The app dynamically alerts you when you are nearing your limits.
-- **Advanced Insights**: Interactive Pie Charts and category-by-category allocation breakdowns to understand where your money goes.
+- **Advanced Insights**: Interactive Pie Charts, category-by-category allocation breakdowns, and completely separate visualization cards for your Large Purchases to give pristine financial visibility.
 - **Smart UI Navigation**: Featuring a liquid morph navigation bar, glassmorphism design, and 60fps animations.
 - **Privacy First (Local-Only)**: We believe financial data belongs to you. FlowLedger has `allowBackup` disabled to prevent unauthorized cloud syncing. All data is securely stored locally using a parameterized Room database.
 - **Dark Mode Support**: Multiple visual themes tailored for battery saving and eye comfort.
@@ -48,7 +52,7 @@ Everything you need to compile the app is included in the project.
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/FlowLedger.git
+git clone https://github.com/githubmofo/FlowLedger.git
 cd FlowLedger
 ```
 
