@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.flowledger.ui.home.HomeFragment"
+        android:label="Home" />
+
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.example.flowledger.ui.search.SearchFragment"
+        android:label="Search" />
+
+    <dialog
+        android:id="@+id/addExpenseFragment"
+        android:name="com.example.flowledger.ui.addexpense.AddExpenseBottomSheetFragment"
+        android:label="Add Expense" />
+
+    <fragment
+        android:id="@+id/insightsFragment"
+        android:name="com.example.flowledger.ui.insights.InsightsFragment"
+        android:label="Insights" />
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.flowledger.ui.profile.ProfileFragment"
+        android:label="Profile" />
+
+</navigation>

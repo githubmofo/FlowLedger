@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="glassSurfaceColor" format="color" />
+    <attr name="glassStrokeColor" format="color" />
+    <attr name="accentGlowColor" format="color" />
+    <attr name="surfaceGlassColor" format="color" />
+</resources>

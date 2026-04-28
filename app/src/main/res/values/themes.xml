@@ -1,0 +1,53 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Base.Theme.FlowLedger" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/glass_dark_primary</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="android:colorBackground">@color/glass_dark_bg</item>
+        <item name="colorOnBackground">@color/frosted_white</item>
+        <item name="colorSurface">@color/glass_dark_surface</item>
+        <item name="colorOnSurface">@color/white</item>
+        <item name="colorSurfaceVariant">@color/charcoal_soft</item>
+        <item name="colorOnSurfaceVariant">@color/lavender_gray</item>
+        
+        <!-- Glassmorphism Tokens -->
+        <item name="glassSurfaceColor">@color/glass_dark_card</item>
+        <item name="glassStrokeColor">@color/glass_dark_border</item>
+        <item name="surfaceGlassColor">@color/glass_dark_surface</item>
+        <item name="accentGlowColor">@color/glass_dark_glow</item>
+        
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
+    <style name="Theme.FlowLedger" parent="Base.Theme.FlowLedger" />
+    
+    <style name="Theme.FlowLedger.Emerald" parent="Base.Theme.FlowLedger">
+        <item name="android:colorBackground">#05100C</item>
+        <item name="colorSurface">#0D1F1A</item>
+        <item name="colorOnSurface">#E0F2F1</item>
+        <item name="colorSurfaceVariant">#1A3A2E</item>
+        <item name="colorOnSurfaceVariant">#A7C4BC</item>
+        <item name="colorPrimary">#00C853</item>
+        <item name="colorOnPrimary">#00381C</item>
+        <item name="accentGlowColor">#3300C853</item>
+        <item name="glassSurfaceColor">#1AFFFFFF</item>
+        <item name="glassStrokeColor">#1AFFFFFF</item>
+        <item name="surfaceGlassColor">#0D1F1A</item>
+    </style>
+    
+    <style name="Theme.FlowLedger.Light" parent="Theme.Material3.Light.NoActionBar">
+        <item name="colorPrimary">@color/glass_light_primary</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="android:colorBackground">@color/glass_light_bg</item>
+        <item name="colorOnSurface">@color/navy_deep</item>
+        <item name="colorSurface">@color/glass_light_surface</item>
+        <item name="colorSurfaceVariant">@color/misty_silver</item>
+        <item name="colorOnSurfaceVariant">@color/lavender_gray</item>
+        
+        <item name="glassSurfaceColor">@color/glass_light_card</item>
+        <item name="glassStrokeColor">@color/glass_light_border</item>
+        <item name="accentGlowColor">@color/glass_light_glow</item>
+        <item name="surfaceGlassColor">@color/frosted_white</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+</resources>

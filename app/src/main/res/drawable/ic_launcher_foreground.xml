@@ -1,0 +1,17 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Fluid Ribbon 'F' Mark -->
+    <path
+        android:fillColor="@color/glass_dark_primary"
+        android:pathData="M36,26 C36,22 40,18 44,18 L70,18 C74,18 76,21 76,24 C76,27 74,30 70,30 L46,30 L46,46 L64,46 C68,46 70,49 70,52 C70,55 68,58 64,58 L46,58 L46,80 C46,84 42,88 38,88 C34,88 30,84 30,80 L30,32 C30,28 32,26 36,26 Z" />
+
+    <!-- Radiant Accent Dot -->
+    <path
+        android:fillColor="@color/glass_dark_accent"
+        android:pathData="M80,42 A5,5 0 1,1 80,52 A5,5 0 1,1 80,42" />
+
+</vector>

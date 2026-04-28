@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    
+    <!-- FUTURISTIC GLASS DARK (Deep Space) -->
+    <color name="glass_dark_bg">#070A0F</color>
+    <color name="glass_dark_surface">#1A222C</color>
+    <color name="glass_dark_primary">#6C63FF</color>
+    <color name="glass_dark_accent">#00E5FF</color>
+    <color name="glass_dark_glow">#4D6C63FF</color>
+    <color name="glass_dark_card">#1AFFFFFF</color>
+    <color name="glass_dark_border">#26FFFFFF</color>
+    
+    <!-- FUTURISTIC GLASS LIGHT (Frosted Cloud) -->
+    <color name="glass_light_bg">#F0F4F8</color>
+    <color name="glass_light_surface">#E1E8F0</color>
+    <color name="glass_light_primary">#4D6C63FF</color>
+    <color name="glass_light_accent">#3F51B5</color>
+    <color name="glass_light_glow">#264D6C63</color>
+    <color name="glass_light_card">#CCFFFFFF</color>
+    <color name="glass_light_border">#4DFFFFFF</color>
+
+    <!-- Sophisticated Tones -->
+    <color name="navy_deep">#0A192F</color>
+    <color name="charcoal_soft">#1E293B</color>
+    <color name="indigo_glass">#6366F1</color>
+    <color name="violet_blue">#8B5CF6</color>
+    <color name="frosted_white">#F8FAFC</color>
+    <color name="pale_blue">#E2E8F0</color>
+    <color name="lavender_gray">#94A3B8</color>
+    <color name="misty_silver">#CBD5E1</color>
+
+    <!-- UI Components -->
+    <color name="expense_red">#FF4B5C</color>
+    <color name="income_green">#00E676</color>
+    <color name="warning_amber">#FFD600</color>
+    
+    <!-- Glass Tokens (Shared) -->
+    <color name="glass_white_10">#1AFFFFFF</color>
+    <color name="glass_white_20">#33FFFFFF</color>
+    <color name="glass_black_10">#1A000000</color>
+</resources>
