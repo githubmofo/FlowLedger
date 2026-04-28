@@ -85,5 +85,8 @@ FlowLedger employs rigorous security and architectural standards:
 
 ---
 
-## 📄 License
-This project is open-source. Feel free to use and modify it for your personal use.
+## Author
+
+- By Jenish Lad
+- By Ansh Nayak
+- By Parv Garara
