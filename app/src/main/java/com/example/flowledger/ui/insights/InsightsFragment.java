@@ -35,14 +35,13 @@ public class InsightsFragment extends Fragment {
 
     private InsightsViewModel viewModel;
     private LargePurchaseViewModel largePurchaseViewModel;
-    private PieChart pieChart;
+    private PieChart pieChart, lpPieChart;
+    private View layoutLpChart;
     private TextView tvTopCategory, tvDailyAvg, tvEmptyAllocation;
     private RecyclerView rvCategoryBreakdown;
     private CategoryAllocationAdapter allocationAdapter;
     private final ExecutorService backgroundExecutor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
-    private List<CategorySpending> baseSpending = new ArrayList<>();
-    private List<LargePurchase> largePurchasesList = new ArrayList<>();
 
     @Nullable
     @Override
@@ -57,6 +56,8 @@ public class InsightsFragment extends Fragment {
         viewModel = new ViewModelProvider(this).get(InsightsViewModel.class);
         largePurchaseViewModel = new ViewModelProvider(this).get(LargePurchaseViewModel.class);
         pieChart = view.findViewById(R.id.pieChart);
+        lpPieChart = view.findViewById(R.id.lpPieChart);
+        layoutLpChart = view.findViewById(R.id.layoutLpChart);
         tvTopCategory = view.findViewById(R.id.tvTopCategory);
         tvDailyAvg = view.findViewById(R.id.tvDailyAvg);
         tvEmptyAllocation = view.findViewById(R.id.tvEmptyAllocation);
@@ -65,62 +66,22 @@ public class InsightsFragment extends Fragment {
         allocationAdapter = new CategoryAllocationAdapter();
         rvCategoryBreakdown.setAdapter(allocationAdapter);
 
-        setupPieChart();
+        setupPieChart(pieChart, "Spending");
+        setupPieChart(lpPieChart, "Large Purchases");
 
         viewModel.getCategorySpending().observe(getViewLifecycleOwner(), spendingList -> {
-            baseSpending = spendingList != null ? spendingList : new ArrayList<>();
-            processInsights();
-        });
-
-        largePurchaseViewModel.getAllLargePurchases().observe(getViewLifecycleOwner(), purchases -> {
-            largePurchasesList = purchases != null ? purchases : new ArrayList<>();
-            processInsights();
-        });
-    }
-
-    private void processInsights() {
-        List<CategorySpending> mergedList = new ArrayList<>();
-        
-        for (CategorySpending cs : baseSpending) {
-            CategorySpending copy = new CategorySpending();
-            copy.categoryName = cs.categoryName;
-            copy.totalAmount = cs.totalAmount;
-            copy.categoryColor = cs.categoryColor;
-            mergedList.add(copy);
-        }
-
-        for (LargePurchase lp : largePurchasesList) {
-            boolean found = false;
-            for (CategorySpending ms : mergedList) {
-                if (ms.categoryName.equals("Large Purchases")) {
-                    ms.totalAmount += lp.getAmount();
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                CategorySpending newCs = new CategorySpending();
-                newCs.categoryName = "Large Purchases";
-                newCs.totalAmount = lp.getAmount();
-                newCs.categoryColor = "#FF9800"; // default color
-                mergedList.add(newCs);
-            }
-        }
-
-        mergedList.sort((a, b) -> Double.compare(b.totalAmount, a.totalAmount));
-
-        if (mergedList != null && !mergedList.isEmpty()) {
+            if (spendingList != null && !spendingList.isEmpty()) {
                 tvEmptyAllocation.setVisibility(View.GONE);
                 rvCategoryBreakdown.setVisibility(View.VISIBLE);
-                // Process chart data on background thread to avoid UI jank
+                
                 backgroundExecutor.execute(() -> {
                     final ArrayList<PieEntry> entries = new ArrayList<>();
                     final ArrayList<Integer> colors = new ArrayList<>();
                     double maxAmount = 0;
-                    CategorySpending topCategory = mergedList.get(0);
+                    CategorySpending topCategory = spendingList.get(0);
                     double totalAmount = 0;
 
-                    for (CategorySpending spending : mergedList) {
+                    for (CategorySpending spending : spendingList) {
                         entries.add(new PieEntry((float) spending.totalAmount, spending.categoryName));
                         try {
                             colors.add(Color.parseColor(spending.categoryColor));
@@ -138,15 +99,14 @@ public class InsightsFragment extends Fragment {
                     final double dailyAvg = totalAmount / 30.0;
                     final double totalAmountFinal = totalAmount;
 
-                    // Post results back to UI thread
                     mainHandler.post(() -> {
-                        if (!isAdded()) return; // Fragment might have been detached
+                        if (!isAdded()) return;
 
                         tvTopCategory.setText(topName);
                         tvDailyAvg.setText(String.format("₹%.0f", dailyAvg));
-                        updateChartData(entries, colors);
+                        updateChartData(pieChart, entries, colors);
                         
-                        allocationAdapter.setData(mergedList, totalAmountFinal);
+                        allocationAdapter.setData(spendingList, totalAmountFinal);
                     });
                 });
             } else {
@@ -157,38 +117,78 @@ public class InsightsFragment extends Fragment {
                 allocationAdapter.setData(new ArrayList<>(), 0);
                 pieChart.clear();
             }
+        });
+
+        largePurchaseViewModel.getAllLargePurchases().observe(getViewLifecycleOwner(), purchases -> {
+            if (purchases != null && !purchases.isEmpty()) {
+                layoutLpChart.setVisibility(View.VISIBLE);
+                
+                backgroundExecutor.execute(() -> {
+                    double emiTotal = 0, loanTotal = 0, oneTimeTotal = 0;
+                    for (LargePurchase lp : purchases) {
+                        if ("EMI".equals(lp.getPurchaseType())) emiTotal += lp.getAmount();
+                        else if ("LOAN".equals(lp.getPurchaseType())) loanTotal += lp.getAmount();
+                        else oneTimeTotal += lp.getAmount();
+                    }
+                    
+                    final ArrayList<PieEntry> entries = new ArrayList<>();
+                    final ArrayList<Integer> colors = new ArrayList<>();
+                    
+                    if (emiTotal > 0) {
+                        entries.add(new PieEntry((float) emiTotal, "EMI"));
+                        colors.add(Color.parseColor("#4CAF50")); // Green
+                    }
+                    if (loanTotal > 0) {
+                        entries.add(new PieEntry((float) loanTotal, "Loans"));
+                        colors.add(Color.parseColor("#F44336")); // Red
+                    }
+                    if (oneTimeTotal > 0) {
+                        entries.add(new PieEntry((float) oneTimeTotal, "One-Time"));
+                        colors.add(Color.parseColor("#2196F3")); // Blue
+                    }
+
+                    mainHandler.post(() -> {
+                        if (!isAdded()) return;
+                        updateChartData(lpPieChart, entries, colors);
+                    });
+                });
+            } else {
+                layoutLpChart.setVisibility(View.GONE);
+                lpPieChart.clear();
+            }
+        });
     }
 
-    private void setupPieChart() {
-        pieChart.setUsePercentValues(true);
-        pieChart.getDescription().setEnabled(false);
-        pieChart.setExtraOffsets(5, 10, 5, 5);
+    private void setupPieChart(PieChart chart, String centerText) {
+        chart.setUsePercentValues(true);
+        chart.getDescription().setEnabled(false);
+        chart.setExtraOffsets(5, 10, 5, 5);
 
-        pieChart.setDragDecelerationFrictionCoef(0.95f);
+        chart.setDragDecelerationFrictionCoef(0.95f);
 
-        pieChart.setDrawHoleEnabled(true);
-        pieChart.setHoleColor(Color.TRANSPARENT);
-        pieChart.setTransparentCircleColor(Color.WHITE);
-        pieChart.setTransparentCircleAlpha(110);
+        chart.setDrawHoleEnabled(true);
+        chart.setHoleColor(Color.TRANSPARENT);
+        chart.setTransparentCircleColor(Color.WHITE);
+        chart.setTransparentCircleAlpha(110);
 
-        pieChart.setHoleRadius(58f);
-        pieChart.setTransparentCircleRadius(61f);
+        chart.setHoleRadius(58f);
+        chart.setTransparentCircleRadius(61f);
 
-        pieChart.setDrawCenterText(true);
-        pieChart.setCenterText("Spending");
-        pieChart.setCenterTextColor(getResources().getColor(android.R.color.white, null)); // Keep white for contrast on donut
-        pieChart.setCenterTextSize(20f);
+        chart.setDrawCenterText(true);
+        chart.setCenterText(centerText);
+        chart.setCenterTextColor(getResources().getColor(android.R.color.white, null));
+        chart.setCenterTextSize(20f);
 
-        pieChart.setRotationAngle(0);
-        pieChart.setRotationEnabled(true);
-        pieChart.setHighlightPerTapEnabled(true);
+        chart.setRotationAngle(0);
+        chart.setRotationEnabled(true);
+        chart.setHighlightPerTapEnabled(true);
 
-        pieChart.getLegend().setEnabled(false);
-        pieChart.setEntryLabelColor(getResources().getColor(android.R.color.white, null));
+        chart.getLegend().setEnabled(false);
+        chart.setEntryLabelColor(getResources().getColor(android.R.color.white, null));
     }
 
-    private void updateChartData(ArrayList<PieEntry> entries, ArrayList<Integer> colors) {
-        PieDataSet dataSet = new PieDataSet(entries, "Category Spending");
+    private void updateChartData(PieChart chart, ArrayList<PieEntry> entries, ArrayList<Integer> colors) {
+        PieDataSet dataSet = new PieDataSet(entries, "");
         dataSet.setSliceSpace(3f);
         dataSet.setSelectionShift(5f);
         dataSet.setColors(colors);
@@ -198,10 +198,9 @@ public class InsightsFragment extends Fragment {
         data.setValueTextSize(11f);
         data.setValueTextColor(getResources().getColor(android.R.color.white, null));
 
-        pieChart.setData(data);
-        // Defer animation slightly so the layout is fully settled first
-        pieChart.post(() -> pieChart.animateY(1000, Easing.EaseInOutQuad));
-        pieChart.invalidate();
+        chart.setData(data);
+        chart.post(() -> chart.animateY(1000, Easing.EaseInOutQuad));
+        chart.invalidate();
     }
 
     @Override

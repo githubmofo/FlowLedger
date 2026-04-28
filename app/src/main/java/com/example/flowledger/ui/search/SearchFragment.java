@@ -88,9 +88,20 @@ public class SearchFragment extends Fragment {
         cgFilters.setOnCheckedStateChangeListener((group, checkedIds) -> {
             if (checkedIds.isEmpty()) {
                 viewModel.setSearchQuery(etSearch.getText().toString());
+                filterLargePurchases(etSearch.getText().toString());
                 return;
             }
             int checkedId = checkedIds.get(0);
+            
+            if (checkedId == R.id.chipLarge) {
+                // Large purchases mode
+                tvLargePurchasesHeader.setVisibility(View.VISIBLE);
+                rvSearchLargePurchases.setVisibility(View.VISIBLE);
+                largePurchaseAdapter.setPurchases(allLargePurchases);
+                viewModel.setSearchQuery("NON_EXISTENT_QUERY_FOR_EMPTY"); // Hack to empty normal transactions
+                return;
+            }
+
             String filter = "";
             if (checkedId == R.id.chipUPI) filter = "UPI";
             else if (checkedId == R.id.chipCash) filter = "Cash";
@@ -101,6 +112,7 @@ public class SearchFragment extends Fragment {
             } else {
                 viewModel.setSearchQuery(filter);
             }
+            filterLargePurchases(etSearch.getText().toString());
         });
 
         viewModel.getSearchResults().observe(getViewLifecycleOwner(), transactions -> {
