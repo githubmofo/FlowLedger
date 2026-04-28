@@ -16,6 +16,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.flowledger.R;
 import com.example.flowledger.ui.home.TransactionAdapter;
 import com.example.flowledger.ui.addexpense.AddExpenseBottomSheetFragment;
+import com.example.flowledger.ui.largepurchases.AddLargePurchaseBottomSheetFragment;
+import com.example.flowledger.ui.largepurchases.LargePurchaseAdapter;
+import com.example.flowledger.ui.largepurchases.LargePurchaseViewModel;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 
@@ -24,7 +28,9 @@ import java.util.Locale;
 public class HomeFragment extends Fragment {
 
     private HomeViewModel viewModel;
+    private LargePurchaseViewModel largePurchaseViewModel;
     private TransactionAdapter adapter;
+    private LargePurchaseAdapter largePurchaseAdapter;
     private TextView tvMainTotal, tvBudgetInfo, tvMicroInsight;
     private LinearProgressIndicator progressBudget;
     private ChipGroup cgPeriod;
@@ -47,6 +53,7 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         viewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+        largePurchaseViewModel = new ViewModelProvider(this).get(LargePurchaseViewModel.class);
 
         tvMainTotal = view.findViewById(R.id.tvMainTotal);
         tvBudgetInfo = view.findViewById(R.id.tvBudgetInfo);
@@ -58,6 +65,16 @@ public class HomeFragment extends Fragment {
         RecyclerView rvTransactions = view.findViewById(R.id.rvTransactions);
         adapter = new TransactionAdapter();
         rvTransactions.setAdapter(adapter);
+
+        RecyclerView rvLargePurchases = view.findViewById(R.id.rvLargePurchases);
+        largePurchaseAdapter = new LargePurchaseAdapter();
+        rvLargePurchases.setAdapter(largePurchaseAdapter);
+        
+        MaterialButton btnAddLargePurchase = view.findViewById(R.id.btnAddLargePurchase);
+        btnAddLargePurchase.setOnClickListener(v -> {
+            AddLargePurchaseBottomSheetFragment sheet = new AddLargePurchaseBottomSheetFragment();
+            sheet.show(getParentFragmentManager(), "add_large_purchase");
+        });
 
         // Defer heavy list observation to allow the layout to settle first
         view.post(() -> {
@@ -73,6 +90,10 @@ public class HomeFragment extends Fragment {
             viewModel.getRecentTransactions().observe(getViewLifecycleOwner(), transactions -> {
                 adapter.setTransactions(transactions);
                 updateInsight(transactions.size());
+            });
+
+            largePurchaseViewModel.getAllLargePurchases().observe(getViewLifecycleOwner(), largePurchases -> {
+                largePurchaseAdapter.setPurchases(largePurchases);
             });
 
             viewModel.getDailyTotal().observe(getViewLifecycleOwner(), total -> {
