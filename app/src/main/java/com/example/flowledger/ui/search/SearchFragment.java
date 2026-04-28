@@ -65,6 +65,11 @@ public class SearchFragment extends Fragment {
         largePurchaseAdapter = new LargePurchaseAdapter();
         rvSearchLargePurchases.setAdapter(largePurchaseAdapter);
 
+        largePurchaseAdapter.setOnLargePurchaseClickListener(purchase -> {
+            AddLargePurchaseBottomSheetFragment editSheet = AddLargePurchaseBottomSheetFragment.newInstance(purchase.getId());
+            editSheet.show(getParentFragmentManager(), "edit_large_purchase");
+        });
+
         adapter.setOnTransactionClickListener(transaction -> {
             AddExpenseBottomSheetFragment editSheet = AddExpenseBottomSheetFragment.newInstance(transaction.transaction.getId());
             editSheet.show(getParentFragmentManager(), "edit_expense");

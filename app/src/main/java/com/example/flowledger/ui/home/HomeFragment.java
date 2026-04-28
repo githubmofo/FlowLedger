@@ -70,6 +70,11 @@ public class HomeFragment extends Fragment {
         largePurchaseAdapter = new LargePurchaseAdapter();
         rvLargePurchases.setAdapter(largePurchaseAdapter);
         
+        largePurchaseAdapter.setOnLargePurchaseClickListener(purchase -> {
+            AddLargePurchaseBottomSheetFragment editSheet = AddLargePurchaseBottomSheetFragment.newInstance(purchase.getId());
+            editSheet.show(getParentFragmentManager(), "edit_large_purchase");
+        });
+        
         MaterialButton btnAddLargePurchase = view.findViewById(R.id.btnAddLargePurchase);
         btnAddLargePurchase.setOnClickListener(v -> {
             AddLargePurchaseBottomSheetFragment sheet = new AddLargePurchaseBottomSheetFragment();

@@ -36,6 +36,15 @@ public class AddLargePurchaseBottomSheetFragment extends BottomSheetDialogFragme
     private MaterialButton btnSave;
     
     private long purchaseTimestamp;
+    private int purchaseId = -1;
+
+    public static AddLargePurchaseBottomSheetFragment newInstance(int id) {
+        AddLargePurchaseBottomSheetFragment fragment = new AddLargePurchaseBottomSheetFragment();
+        Bundle args = new Bundle();
+        args.putInt("purchase_id", id);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @NonNull
     @Override
@@ -75,11 +84,43 @@ public class AddLargePurchaseBottomSheetFragment extends BottomSheetDialogFragme
         layoutEmiFields = view.findViewById(R.id.layoutEmiFields);
         btnSave = view.findViewById(R.id.btnSave);
         
+        if (getArguments() != null) {
+            purchaseId = getArguments().getInt("purchase_id", -1);
+        }
+
         purchaseTimestamp = System.currentTimeMillis();
         SimpleDateFormat sdf = new SimpleDateFormat("EEE, MMM dd, yyyy", Locale.getDefault());
         tvDate.setText(sdf.format(new Date(purchaseTimestamp)));
 
-        cgPurchaseType.check(R.id.chipOneTime);
+        if (purchaseId != -1) {
+            viewModel.getLargePurchaseById(purchaseId).observe(getViewLifecycleOwner(), purchase -> {
+                if (purchase != null) {
+                    etTitleInput.setText(purchase.getTitle());
+                    etAmount.setText(String.valueOf(purchase.getAmount()));
+                    purchaseTimestamp = purchase.getPurchaseDate();
+                    tvDate.setText(sdf.format(new Date(purchaseTimestamp)));
+                    
+                    if (purchase.getPurchaseType().equals("EMI")) {
+                        cgPurchaseType.check(R.id.chipEmi);
+                        layoutEmiFields.setVisibility(View.VISIBLE);
+                        etEmiAmount.setText(String.valueOf(purchase.getEmiAmount()));
+                        etEmiMonths.setText(String.valueOf(purchase.getEmiMonths()));
+                    } else if (purchase.getPurchaseType().equals("LOAN")) {
+                        cgPurchaseType.check(R.id.chipLoan);
+                        layoutEmiFields.setVisibility(View.VISIBLE);
+                        etEmiAmount.setText(String.valueOf(purchase.getEmiAmount()));
+                        etEmiMonths.setText(String.valueOf(purchase.getEmiMonths()));
+                    } else {
+                        cgPurchaseType.check(R.id.chipOneTime);
+                        layoutEmiFields.setVisibility(View.GONE);
+                    }
+                    
+                    btnSave.setText("Update");
+                }
+            });
+        } else {
+            cgPurchaseType.check(R.id.chipOneTime);
+        }
         cgPurchaseType.setOnCheckedStateChangeListener((group, checkedIds) -> {
             if (!checkedIds.isEmpty()) {
                 int checkedId = checkedIds.get(0);
@@ -134,9 +175,14 @@ public class AddLargePurchaseBottomSheetFragment extends BottomSheetDialogFragme
         int categoryId = 1; 
         String paymentMethod = "Card";
 
-        viewModel.saveLargePurchase(title, amount, categoryId, paymentMethod, purchaseType, purchaseTimestamp, "", emiAmount, emiMonths, loanPrincipal);
+        if (purchaseId == -1) {
+            viewModel.saveLargePurchase(title, amount, categoryId, paymentMethod, purchaseType, purchaseTimestamp, "", emiAmount, emiMonths, loanPrincipal);
+            Toast.makeText(getContext(), "Large Purchase Saved", Toast.LENGTH_SHORT).show();
+        } else {
+            viewModel.updateLargePurchase(purchaseId, title, amount, categoryId, paymentMethod, purchaseType, purchaseTimestamp, "", emiAmount, emiMonths, loanPrincipal);
+            Toast.makeText(getContext(), "Large Purchase Updated", Toast.LENGTH_SHORT).show();
+        }
         
-        Toast.makeText(getContext(), "Large Purchase Saved", Toast.LENGTH_SHORT).show();
         dismiss();
     }
 }

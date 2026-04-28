@@ -65,4 +65,24 @@ public class LargePurchase {
     
     public double getLoanPrincipal() { return loanPrincipal; }
     public void setLoanPrincipal(double loanPrincipal) { this.loanPrincipal = loanPrincipal; }
+
+    public int getRemainingEmiMonths() {
+        if (emiMonths <= 0) return 0;
+        long diff = System.currentTimeMillis() - purchaseDate;
+        long monthMillis = 30L * 24L * 60L * 60L * 1000L;
+        int monthsPassed = (int) (diff / monthMillis);
+        int remaining = emiMonths - monthsPassed;
+        return Math.max(0, remaining);
+    }
+
+    public double getRemainingLoanPrincipal() {
+        if (emiAmount <= 0) return loanPrincipal > 0 ? loanPrincipal : amount;
+        double basePrincipal = loanPrincipal > 0 ? loanPrincipal : amount;
+        long diff = System.currentTimeMillis() - purchaseDate;
+        long monthMillis = 30L * 24L * 60L * 60L * 1000L;
+        int monthsPassed = (int) (diff / monthMillis);
+        double deducted = Math.min(monthsPassed, emiMonths) * emiAmount;
+        double remaining = basePrincipal - deducted;
+        return Math.max(0, remaining);
+    }
 }

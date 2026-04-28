@@ -19,7 +19,16 @@ import java.util.Locale;
 
 public class LargePurchaseAdapter extends RecyclerView.Adapter<LargePurchaseAdapter.ViewHolder> {
 
+    public interface OnLargePurchaseClickListener {
+        void onPurchaseClick(LargePurchase purchase);
+    }
+
     private List<LargePurchase> purchases = new ArrayList<>();
+    private OnLargePurchaseClickListener listener;
+
+    public void setOnLargePurchaseClickListener(OnLargePurchaseClickListener listener) {
+        this.listener = listener;
+    }
 
     public void setPurchases(List<LargePurchase> purchases) {
         this.purchases = purchases;
@@ -47,10 +56,22 @@ public class LargePurchaseAdapter extends RecyclerView.Adapter<LargePurchaseAdap
 
         if (purchase.getPurchaseType().equals("EMI") || purchase.getPurchaseType().equals("LOAN")) {
             holder.tvEmiDetails.setVisibility(View.VISIBLE);
-            holder.tvEmiDetails.setText(String.format(Locale.getDefault(), "₹%,.0f/mo (%dmo)", purchase.getEmiAmount(), purchase.getEmiMonths()));
+            int remaining = purchase.getRemainingEmiMonths();
+            if (remaining > 0) {
+                holder.tvEmiDetails.setText(String.format(Locale.getDefault(), "₹%,.0f/mo (%dmo left)", purchase.getEmiAmount(), remaining));
+            } else {
+                holder.tvEmiDetails.setText("Paid Off");
+                holder.tvEmiDetails.setTextColor(holder.itemView.getResources().getColor(android.R.color.holo_green_dark, null));
+            }
         } else {
             holder.tvEmiDetails.setVisibility(View.GONE);
         }
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onPurchaseClick(purchase);
+            }
+        });
     }
 
     @Override

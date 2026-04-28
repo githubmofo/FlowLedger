@@ -61,13 +61,11 @@ public class ProfileFragment extends Fragment {
             double totalLoan = 0;
             if (purchases != null) {
                 for (LargePurchase p : purchases) {
-                    if ("EMI".equals(p.getPurchaseType()) || "LOAN".equals(p.getPurchaseType())) {
+                    if (("EMI".equals(p.getPurchaseType()) || "LOAN".equals(p.getPurchaseType())) && p.getRemainingEmiMonths() > 0) {
                         totalEmi += p.getEmiAmount();
-                        if ("LOAN".equals(p.getPurchaseType())) {
-                            totalLoan += p.getLoanPrincipal();
-                        } else {
-                            totalLoan += p.getAmount(); // for normal EMI
-                        }
+                    }
+                    if (p.getRemainingLoanPrincipal() > 0) {
+                        totalLoan += p.getRemainingLoanPrincipal();
                     }
                 }
             }
