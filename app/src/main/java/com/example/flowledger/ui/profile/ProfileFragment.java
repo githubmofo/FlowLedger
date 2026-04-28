@@ -13,14 +13,19 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.flowledger.R;
+import com.example.flowledger.ui.largepurchases.LargePurchaseViewModel;
+import com.example.flowledger.data.db.entity.LargePurchase;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.textfield.TextInputEditText;
+
+import java.util.Locale;
 
 public class ProfileFragment extends Fragment {
 
     private ProfileViewModel viewModel;
+    private LargePurchaseViewModel largePurchaseViewModel;
     private TextInputEditText etName, etDailyLimit, etWeeklyLimit, etMonthlyLimit;
-    private TextView tvAvatarPlaceholder;
+    private TextView tvAvatarPlaceholder, tvTotalEmi, tvTotalLoan;
     private MaterialButtonToggleGroup toggleTheme;
 
     @Nullable
@@ -33,12 +38,15 @@ public class ProfileFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         viewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
+        largePurchaseViewModel = new ViewModelProvider(this).get(LargePurchaseViewModel.class);
 
         etName = view.findViewById(R.id.etName);
         etDailyLimit = view.findViewById(R.id.etDailyLimit);
         etWeeklyLimit = view.findViewById(R.id.etWeeklyLimit);
         etMonthlyLimit = view.findViewById(R.id.etMonthlyLimit);
         tvAvatarPlaceholder = view.findViewById(R.id.tvAvatarPlaceholder);
+        tvTotalEmi = view.findViewById(R.id.tvTotalEmi);
+        tvTotalLoan = view.findViewById(R.id.tvTotalLoan);
         toggleTheme = view.findViewById(R.id.toggleTheme);
         View btnSaveProfile = view.findViewById(R.id.btnSaveProfile);
 
@@ -46,6 +54,25 @@ public class ProfileFragment extends Fragment {
 
         btnSaveProfile.setOnClickListener(v -> {
             saveData();
+        });
+
+        largePurchaseViewModel.getAllLargePurchases().observe(getViewLifecycleOwner(), purchases -> {
+            double totalEmi = 0;
+            double totalLoan = 0;
+            if (purchases != null) {
+                for (LargePurchase p : purchases) {
+                    if ("EMI".equals(p.getPurchaseType()) || "LOAN".equals(p.getPurchaseType())) {
+                        totalEmi += p.getEmiAmount();
+                        if ("LOAN".equals(p.getPurchaseType())) {
+                            totalLoan += p.getLoanPrincipal();
+                        } else {
+                            totalLoan += p.getAmount(); // for normal EMI
+                        }
+                    }
+                }
+            }
+            tvTotalEmi.setText(String.format(Locale.getDefault(), "₹%,.0f", totalEmi));
+            tvTotalLoan.setText(String.format(Locale.getDefault(), "₹%,.0f", totalLoan));
         });
     }
 

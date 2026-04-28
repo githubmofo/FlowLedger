@@ -17,6 +17,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.flowledger.R;
 import com.example.flowledger.data.db.entity.CategorySpending;
+import com.example.flowledger.data.db.entity.LargePurchase;
+import com.example.flowledger.ui.largepurchases.LargePurchaseViewModel;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
@@ -32,12 +34,15 @@ import java.util.concurrent.Executors;
 public class InsightsFragment extends Fragment {
 
     private InsightsViewModel viewModel;
+    private LargePurchaseViewModel largePurchaseViewModel;
     private PieChart pieChart;
     private TextView tvTopCategory, tvDailyAvg, tvEmptyAllocation;
     private RecyclerView rvCategoryBreakdown;
     private CategoryAllocationAdapter allocationAdapter;
     private final ExecutorService backgroundExecutor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private List<CategorySpending> baseSpending = new ArrayList<>();
+    private List<LargePurchase> largePurchasesList = new ArrayList<>();
 
     @Nullable
     @Override
@@ -50,6 +55,7 @@ public class InsightsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         viewModel = new ViewModelProvider(this).get(InsightsViewModel.class);
+        largePurchaseViewModel = new ViewModelProvider(this).get(LargePurchaseViewModel.class);
         pieChart = view.findViewById(R.id.pieChart);
         tvTopCategory = view.findViewById(R.id.tvTopCategory);
         tvDailyAvg = view.findViewById(R.id.tvDailyAvg);
@@ -62,7 +68,48 @@ public class InsightsFragment extends Fragment {
         setupPieChart();
 
         viewModel.getCategorySpending().observe(getViewLifecycleOwner(), spendingList -> {
-            if (spendingList != null && !spendingList.isEmpty()) {
+            baseSpending = spendingList != null ? spendingList : new ArrayList<>();
+            processInsights();
+        });
+
+        largePurchaseViewModel.getAllLargePurchases().observe(getViewLifecycleOwner(), purchases -> {
+            largePurchasesList = purchases != null ? purchases : new ArrayList<>();
+            processInsights();
+        });
+    }
+
+    private void processInsights() {
+        List<CategorySpending> mergedList = new ArrayList<>();
+        
+        for (CategorySpending cs : baseSpending) {
+            CategorySpending copy = new CategorySpending();
+            copy.categoryName = cs.categoryName;
+            copy.totalAmount = cs.totalAmount;
+            copy.categoryColor = cs.categoryColor;
+            mergedList.add(copy);
+        }
+
+        for (LargePurchase lp : largePurchasesList) {
+            boolean found = false;
+            for (CategorySpending ms : mergedList) {
+                if (ms.categoryName.equals("Large Purchases")) {
+                    ms.totalAmount += lp.getAmount();
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                CategorySpending newCs = new CategorySpending();
+                newCs.categoryName = "Large Purchases";
+                newCs.totalAmount = lp.getAmount();
+                newCs.categoryColor = "#FF9800"; // default color
+                mergedList.add(newCs);
+            }
+        }
+
+        mergedList.sort((a, b) -> Double.compare(b.totalAmount, a.totalAmount));
+
+        if (mergedList != null && !mergedList.isEmpty()) {
                 tvEmptyAllocation.setVisibility(View.GONE);
                 rvCategoryBreakdown.setVisibility(View.VISIBLE);
                 // Process chart data on background thread to avoid UI jank
@@ -70,10 +117,10 @@ public class InsightsFragment extends Fragment {
                     final ArrayList<PieEntry> entries = new ArrayList<>();
                     final ArrayList<Integer> colors = new ArrayList<>();
                     double maxAmount = 0;
-                    CategorySpending topCategory = spendingList.get(0);
+                    CategorySpending topCategory = mergedList.get(0);
                     double totalAmount = 0;
 
-                    for (CategorySpending spending : spendingList) {
+                    for (CategorySpending spending : mergedList) {
                         entries.add(new PieEntry((float) spending.totalAmount, spending.categoryName));
                         try {
                             colors.add(Color.parseColor(spending.categoryColor));
@@ -99,7 +146,7 @@ public class InsightsFragment extends Fragment {
                         tvDailyAvg.setText(String.format("₹%.0f", dailyAvg));
                         updateChartData(entries, colors);
                         
-                        allocationAdapter.setData(spendingList, totalAmountFinal);
+                        allocationAdapter.setData(mergedList, totalAmountFinal);
                     });
                 });
             } else {
@@ -110,7 +157,6 @@ public class InsightsFragment extends Fragment {
                 allocationAdapter.setData(new ArrayList<>(), 0);
                 pieChart.clear();
             }
-        });
     }
 
     private void setupPieChart() {
