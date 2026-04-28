@@ -57,8 +57,12 @@ public class LargePurchaseAdapter extends RecyclerView.Adapter<LargePurchaseAdap
         if (purchase.getPurchaseType().equals("EMI") || purchase.getPurchaseType().equals("LOAN")) {
             holder.tvEmiDetails.setVisibility(View.VISIBLE);
             int remaining = purchase.getRemainingEmiMonths();
+            String freqStr = "/mo";
+            if ("DAILY".equals(purchase.getNote())) freqStr = "/day";
+            else if ("WEEKLY".equals(purchase.getNote())) freqStr = "/wk";
+            
             if (remaining > 0) {
-                holder.tvEmiDetails.setText(String.format(Locale.getDefault(), "₹%,.0f/mo (%dmo left)", purchase.getEmiAmount(), remaining));
+                holder.tvEmiDetails.setText(String.format(Locale.getDefault(), "₹%,.0f%s (%d left)", purchase.getEmiAmount(), freqStr, remaining));
             } else {
                 holder.tvEmiDetails.setText("Paid Off");
                 holder.tvEmiDetails.setTextColor(holder.itemView.getResources().getColor(android.R.color.holo_green_dark, null));

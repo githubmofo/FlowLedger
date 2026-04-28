@@ -69,9 +69,14 @@ public class LargePurchase {
     public int getRemainingEmiMonths() {
         if (emiMonths <= 0) return 0;
         long diff = System.currentTimeMillis() - purchaseDate;
-        long monthMillis = 30L * 24L * 60L * 60L * 1000L;
-        int monthsPassed = (int) (diff / monthMillis);
-        int remaining = emiMonths - monthsPassed;
+        
+        long periodMillis;
+        if ("DAILY".equals(note)) periodMillis = 24L * 60L * 60L * 1000L;
+        else if ("WEEKLY".equals(note)) periodMillis = 7L * 24L * 60L * 60L * 1000L;
+        else periodMillis = 30L * 24L * 60L * 60L * 1000L; // default MONTHLY
+
+        int periodsPassed = (int) (diff / periodMillis);
+        int remaining = emiMonths - periodsPassed;
         return Math.max(0, remaining);
     }
 
@@ -79,9 +84,14 @@ public class LargePurchase {
         if (emiAmount <= 0) return loanPrincipal > 0 ? loanPrincipal : amount;
         double basePrincipal = loanPrincipal > 0 ? loanPrincipal : amount;
         long diff = System.currentTimeMillis() - purchaseDate;
-        long monthMillis = 30L * 24L * 60L * 60L * 1000L;
-        int monthsPassed = (int) (diff / monthMillis);
-        double deducted = Math.min(monthsPassed, emiMonths) * emiAmount;
+
+        long periodMillis;
+        if ("DAILY".equals(note)) periodMillis = 24L * 60L * 60L * 1000L;
+        else if ("WEEKLY".equals(note)) periodMillis = 7L * 24L * 60L * 60L * 1000L;
+        else periodMillis = 30L * 24L * 60L * 60L * 1000L;
+
+        int periodsPassed = (int) (diff / periodMillis);
+        double deducted = Math.min(periodsPassed, emiMonths) * emiAmount;
         double remaining = basePrincipal - deducted;
         return Math.max(0, remaining);
     }

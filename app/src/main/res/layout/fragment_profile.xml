@@ -142,16 +142,61 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
                 android:orientation="horizontal">
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Total Monthly EMI"
+                    android:text="Daily EMI"
                     android:textColor="?attr/colorOnSurface"
                     android:textSize="16sp"/>
                 <TextView
-                    android:id="@+id/tvTotalEmi"
+                    android:id="@+id/tvTotalDailyEmi"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="₹0"
+                    android:textColor="?attr/colorPrimary"
+                    android:textSize="16sp"
+                    android:fontFamily="sans-serif-medium"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Weekly EMI"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="16sp"/>
+                <TextView
+                    android:id="@+id/tvTotalWeeklyEmi"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="₹0"
+                    android:textColor="?attr/colorPrimary"
+                    android:textSize="16sp"
+                    android:fontFamily="sans-serif-medium"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Monthly EMI"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="16sp"/>
+                <TextView
+                    android:id="@+id/tvTotalMonthlyEmi"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="₹0"

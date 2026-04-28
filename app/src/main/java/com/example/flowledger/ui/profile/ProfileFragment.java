@@ -25,7 +25,7 @@ public class ProfileFragment extends Fragment {
     private ProfileViewModel viewModel;
     private LargePurchaseViewModel largePurchaseViewModel;
     private TextInputEditText etName, etDailyLimit, etWeeklyLimit, etMonthlyLimit;
-    private TextView tvAvatarPlaceholder, tvTotalEmi, tvTotalLoan;
+    private TextView tvAvatarPlaceholder, tvTotalDailyEmi, tvTotalWeeklyEmi, tvTotalMonthlyEmi, tvTotalLoan;
     private MaterialButtonToggleGroup toggleTheme;
 
     @Nullable
@@ -45,7 +45,9 @@ public class ProfileFragment extends Fragment {
         etWeeklyLimit = view.findViewById(R.id.etWeeklyLimit);
         etMonthlyLimit = view.findViewById(R.id.etMonthlyLimit);
         tvAvatarPlaceholder = view.findViewById(R.id.tvAvatarPlaceholder);
-        tvTotalEmi = view.findViewById(R.id.tvTotalEmi);
+        tvTotalDailyEmi = view.findViewById(R.id.tvTotalDailyEmi);
+        tvTotalWeeklyEmi = view.findViewById(R.id.tvTotalWeeklyEmi);
+        tvTotalMonthlyEmi = view.findViewById(R.id.tvTotalMonthlyEmi);
         tvTotalLoan = view.findViewById(R.id.tvTotalLoan);
         toggleTheme = view.findViewById(R.id.toggleTheme);
         View btnSaveProfile = view.findViewById(R.id.btnSaveProfile);
@@ -57,19 +59,29 @@ public class ProfileFragment extends Fragment {
         });
 
         largePurchaseViewModel.getAllLargePurchases().observe(getViewLifecycleOwner(), purchases -> {
-            double totalEmi = 0;
+            double dailyEmi = 0;
+            double weeklyEmi = 0;
+            double monthlyEmi = 0;
             double totalLoan = 0;
             if (purchases != null) {
                 for (LargePurchase p : purchases) {
                     if (("EMI".equals(p.getPurchaseType()) || "LOAN".equals(p.getPurchaseType())) && p.getRemainingEmiMonths() > 0) {
-                        totalEmi += p.getEmiAmount();
+                        if ("DAILY".equals(p.getNote())) {
+                            dailyEmi += p.getEmiAmount();
+                        } else if ("WEEKLY".equals(p.getNote())) {
+                            weeklyEmi += p.getEmiAmount();
+                        } else {
+                            monthlyEmi += p.getEmiAmount();
+                        }
                     }
                     if (p.getRemainingLoanPrincipal() > 0) {
                         totalLoan += p.getRemainingLoanPrincipal();
                     }
                 }
             }
-            tvTotalEmi.setText(String.format(Locale.getDefault(), "₹%,.0f", totalEmi));
+            tvTotalDailyEmi.setText(String.format(Locale.getDefault(), "₹%,.0f", dailyEmi));
+            tvTotalWeeklyEmi.setText(String.format(Locale.getDefault(), "₹%,.0f", weeklyEmi));
+            tvTotalMonthlyEmi.setText(String.format(Locale.getDefault(), "₹%,.0f", monthlyEmi));
             tvTotalLoan.setText(String.format(Locale.getDefault(), "₹%,.0f", totalLoan));
         });
     }

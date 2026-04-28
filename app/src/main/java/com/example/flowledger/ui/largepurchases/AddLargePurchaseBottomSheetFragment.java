@@ -31,7 +31,7 @@ public class AddLargePurchaseBottomSheetFragment extends BottomSheetDialogFragme
     private LargePurchaseViewModel viewModel;
     private EditText etTitleInput, etAmount, etEmiAmount, etEmiMonths;
     private TextView tvDate;
-    private ChipGroup cgPurchaseType;
+    private ChipGroup cgPurchaseType, cgEmiFrequency;
     private LinearLayout layoutEmiFields;
     private MaterialButton btnSave;
     
@@ -81,6 +81,7 @@ public class AddLargePurchaseBottomSheetFragment extends BottomSheetDialogFragme
         etEmiMonths = view.findViewById(R.id.etEmiMonths);
         tvDate = view.findViewById(R.id.tvDate);
         cgPurchaseType = view.findViewById(R.id.cgPurchaseType);
+        cgEmiFrequency = view.findViewById(R.id.cgEmiFrequency);
         layoutEmiFields = view.findViewById(R.id.layoutEmiFields);
         btnSave = view.findViewById(R.id.btnSave);
         
@@ -103,15 +104,22 @@ public class AddLargePurchaseBottomSheetFragment extends BottomSheetDialogFragme
                     if (purchase.getPurchaseType().equals("EMI")) {
                         cgPurchaseType.check(R.id.chipEmi);
                         layoutEmiFields.setVisibility(View.VISIBLE);
+                        cgEmiFrequency.setVisibility(View.VISIBLE);
                         etEmiAmount.setText(String.valueOf(purchase.getEmiAmount()));
                         etEmiMonths.setText(String.valueOf(purchase.getEmiMonths()));
+                        if ("DAILY".equals(purchase.getNote())) cgEmiFrequency.check(R.id.chipEmiDaily);
+                        else if ("WEEKLY".equals(purchase.getNote())) cgEmiFrequency.check(R.id.chipEmiWeekly);
+                        else cgEmiFrequency.check(R.id.chipEmiMonthly);
                     } else if (purchase.getPurchaseType().equals("LOAN")) {
                         cgPurchaseType.check(R.id.chipLoan);
                         layoutEmiFields.setVisibility(View.VISIBLE);
+                        cgEmiFrequency.setVisibility(View.GONE);
                         etEmiAmount.setText(String.valueOf(purchase.getEmiAmount()));
                         etEmiMonths.setText(String.valueOf(purchase.getEmiMonths()));
                     } else {
-                        cgPurchaseType.check(R.id.chipOneTime);
+                        if (purchase.getPurchaseType().equals("CASH")) cgPurchaseType.check(R.id.chipCash);
+                        else if (purchase.getPurchaseType().equals("UPI")) cgPurchaseType.check(R.id.chipUpi);
+                        else cgPurchaseType.check(R.id.chipCard);
                         layoutEmiFields.setVisibility(View.GONE);
                     }
                     
@@ -119,13 +127,15 @@ public class AddLargePurchaseBottomSheetFragment extends BottomSheetDialogFragme
                 }
             });
         } else {
-            cgPurchaseType.check(R.id.chipOneTime);
+            cgPurchaseType.check(R.id.chipCard);
+            cgEmiFrequency.check(R.id.chipEmiMonthly);
         }
         cgPurchaseType.setOnCheckedStateChangeListener((group, checkedIds) -> {
             if (!checkedIds.isEmpty()) {
                 int checkedId = checkedIds.get(0);
                 if (checkedId == R.id.chipEmi || checkedId == R.id.chipLoan) {
                     layoutEmiFields.setVisibility(View.VISIBLE);
+                    cgEmiFrequency.setVisibility(checkedId == R.id.chipEmi ? View.VISIBLE : View.GONE);
                 } else {
                     layoutEmiFields.setVisibility(View.GONE);
                 }
@@ -145,15 +155,26 @@ public class AddLargePurchaseBottomSheetFragment extends BottomSheetDialogFragme
         }
 
         double amount = Double.parseDouble(amountStr);
-        String purchaseType = "ONE_TIME";
+        String purchaseType = "CARD";
         
         double emiAmount = 0.0;
         int emiMonths = 0;
         double loanPrincipal = 0.0;
+        String frequency = "";
 
         int selectedTypeId = cgPurchaseType.getCheckedChipId();
-        if (selectedTypeId == R.id.chipEmi) {
+        if (selectedTypeId == R.id.chipCash) {
+            purchaseType = "CASH";
+        } else if (selectedTypeId == R.id.chipUpi) {
+            purchaseType = "UPI";
+        } else if (selectedTypeId == R.id.chipCard) {
+            purchaseType = "CARD";
+        } else if (selectedTypeId == R.id.chipEmi) {
             purchaseType = "EMI";
+            int freqId = cgEmiFrequency.getCheckedChipId();
+            if (freqId == R.id.chipEmiDaily) frequency = "DAILY";
+            else if (freqId == R.id.chipEmiWeekly) frequency = "WEEKLY";
+            else frequency = "MONTHLY";
         } else if (selectedTypeId == R.id.chipLoan) {
             purchaseType = "LOAN";
             loanPrincipal = amount; 
@@ -176,10 +197,10 @@ public class AddLargePurchaseBottomSheetFragment extends BottomSheetDialogFragme
         String paymentMethod = "Card";
 
         if (purchaseId == -1) {
-            viewModel.saveLargePurchase(title, amount, categoryId, paymentMethod, purchaseType, purchaseTimestamp, "", emiAmount, emiMonths, loanPrincipal);
+            viewModel.saveLargePurchase(title, amount, categoryId, paymentMethod, purchaseType, purchaseTimestamp, frequency, emiAmount, emiMonths, loanPrincipal);
             Toast.makeText(getContext(), "Large Purchase Saved", Toast.LENGTH_SHORT).show();
         } else {
-            viewModel.updateLargePurchase(purchaseId, title, amount, categoryId, paymentMethod, purchaseType, purchaseTimestamp, "", emiAmount, emiMonths, loanPrincipal);
+            viewModel.updateLargePurchase(purchaseId, title, amount, categoryId, paymentMethod, purchaseType, purchaseTimestamp, frequency, emiAmount, emiMonths, loanPrincipal);
             Toast.makeText(getContext(), "Large Purchase Updated", Toast.LENGTH_SHORT).show();
         }
         

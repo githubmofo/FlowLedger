@@ -119,10 +119,22 @@
             app:layout_constraintTop_toBottomOf="@id/tvPurchaseTypeLabel"
             app:layout_constraintStart_toStartOf="parent">
             <com.google.android.material.chip.Chip
-                android:id="@+id/chipOneTime"
+                android:id="@+id/chipCash"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="One-time"
+                android:text="Cash"
+                style="@style/Widget.Material3.Chip.Filter" />
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipUpi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="UPI"
+                style="@style/Widget.Material3.Chip.Filter" />
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipCard"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Card"
                 style="@style/Widget.Material3.Chip.Filter" />
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipEmi"
@@ -158,11 +170,38 @@
                 android:textSize="14sp"
                 android:layout_marginBottom="8dp"/>
 
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/cgEmiFrequency"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                app:singleSelection="true"
+                app:selectionRequired="true">
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipEmiDaily"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Daily"
+                    style="@style/Widget.Material3.Chip.Filter" />
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipEmiWeekly"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Weekly"
+                    style="@style/Widget.Material3.Chip.Filter" />
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipEmiMonthly"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Monthly"
+                    style="@style/Widget.Material3.Chip.Filter" />
+            </com.google.android.material.chip.ChipGroup>
+
             <EditText
                 android:id="@+id/etEmiAmount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="EMI Amount (per month)"
+                android:hint="EMI Amount (per period)"
                 android:inputType="numberDecimal"
                 android:textColor="?attr/colorOnSurface"
                 android:textSize="16sp"
@@ -175,7 +214,7 @@
                 android:id="@+id/etEmiMonths"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Number of Months (Tenure)"
+                android:hint="Number of Periods (Tenure)"
                 android:inputType="number"
                 android:textColor="?attr/colorOnSurface"
                 android:textSize="16sp"
