@@ -10,7 +10,7 @@ FlowLedger is a modern, premium, secure, and privacy-first personal finance trac
 
 You can install the latest version of the app directly from this repository:
 
-📥 **[Download FlowLedger.apk](FlowLedger.apk)**
+📥 **[Download FlowLedger.apk](https://github.com/githubmofo/FlowLedger/raw/main/FlowLedger.apk)**
 
 **Installation Steps:**
 1. Download the `FlowLedger.apk` file to your Android device.
