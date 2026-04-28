@@ -23,7 +23,10 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class AddExpenseBottomSheetFragment extends BottomSheetDialogFragment {
 
@@ -32,7 +35,7 @@ public class AddExpenseBottomSheetFragment extends BottomSheetDialogFragment {
     private AddExpenseViewModel viewModel;
     private CategoryAdapter categoryAdapter;
     private EditText etAmount, etNote;
-    private TextView tvTitle;
+    private TextView tvTitle, tvDate;
     private ChipGroup cgQuickAdd, cgPaymentMode;
     private MaterialButton btnSave, btnDelete;
     
@@ -82,7 +85,11 @@ public class AddExpenseBottomSheetFragment extends BottomSheetDialogFragment {
         viewModel = new ViewModelProvider(this).get(AddExpenseViewModel.class);
         
         tvTitle = view.findViewById(R.id.tvTitle);
+        tvDate = view.findViewById(R.id.tvDate);
         etAmount = view.findViewById(R.id.etAmount);
+        
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE, MMM dd, yyyy", Locale.getDefault());
+        tvDate.setText(sdf.format(new Date()));
         etNote = view.findViewById(R.id.etNote);
         cgQuickAdd = view.findViewById(R.id.cgQuickAdd);
         cgPaymentMode = view.findViewById(R.id.cgPaymentMode);
@@ -122,6 +129,10 @@ public class AddExpenseBottomSheetFragment extends BottomSheetDialogFragment {
                 etAmount.setText(String.valueOf(transaction.getAmount()));
                 etNote.setText(transaction.getNote());
                 existingTimestamp = transaction.getTimestamp();
+                
+                SimpleDateFormat sdf = new SimpleDateFormat("EEE, MMM dd, yyyy", Locale.getDefault());
+                tvDate.setText(sdf.format(new Date(existingTimestamp)));
+                
                 categoryAdapter.setSelectedCategoryId(transaction.getCategoryId());
                 
                 if ("UPI".equals(transaction.getPaymentMode())) cgPaymentMode.check(R.id.chipUPI);
